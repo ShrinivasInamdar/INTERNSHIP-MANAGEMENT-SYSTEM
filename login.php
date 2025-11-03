@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="login-container">
                     <div class="login-icon">
                         <i class="fas fa-user-circle"></i>
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div class="admin-hint">
                         <strong><i class="fas fa-info-circle me-2"></i>Admin Login:</strong><br>
-                        Email: admin<br>
+                        Email: admin@gmail.com<br>
                         Password: admin123
                     </div>
                 </div>

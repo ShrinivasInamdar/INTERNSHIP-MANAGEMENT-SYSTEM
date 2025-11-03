@@ -1,0 +1,13 @@
+# Deny direct access to all files in uploads directory
+# Files can only be accessed through download_resume.php
+
+<Files ~ ".*">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# If you still want to allow access through PHP scripts
+<FilesMatch "\.(php)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>

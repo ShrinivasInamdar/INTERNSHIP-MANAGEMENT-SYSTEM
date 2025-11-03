@@ -60,7 +60,7 @@ CREATE TABLE application (
 
 -- INSERT DEFAULT ADMIN ACCOUNT
 INSERT INTO users (email, password, role)
-VALUES ('admin', 'admin123', 'admin');
+VALUES ('admin@gmail.com', 'admin123', 'admin');
 
 -- Link admin user to the admin table
 INSERT INTO admin (user_id)
