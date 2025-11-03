@@ -314,5 +314,48 @@ $dept_result = $conn->query($dept_query);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
+   <!-- View details button code -->
+    <!-- Internship Details Modal -->
+<div class="modal fade" id="internshipModal" tabindex="-1" aria-labelledby="internshipModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="internshipModalLabel">Internship Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="internshipDetailsContent">
+        <!-- Details will be injected here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function viewDetails(internship) {
+  let content = `
+    <h4>${internship.title}</h4>
+    <p><strong>Company:</strong> ${internship.company_name}</p>
+    <p><strong>Role:</strong> ${internship.role}</p>
+    <p><strong>Department:</strong> ${internship.department || 'N/A'}</p>
+    <p><strong>Location:</strong> ${internship.location || 'N/A'}</p>
+    <p><strong>Stipend:</strong> ${internship.stipend || 'N/A'}</p>
+    <p><strong>Duration:</strong> ${internship.duration || 'N/A'}</p>
+    <p><strong>Deadline:</strong> ${internship.deadline}</p>
+    <hr>
+    <p><strong>Description:</strong></p>
+    <p>${internship.description ? internship.description : 'No description provided.'}</p>
+  `;
+
+  document.getElementById('internshipDetailsContent').innerHTML = content;
+
+  // Show modal
+  let modal = new bootstrap.Modal(document.getElementById('internshipModal'));
+  modal.show();
+}
+</script>
 </body>
 </html>
