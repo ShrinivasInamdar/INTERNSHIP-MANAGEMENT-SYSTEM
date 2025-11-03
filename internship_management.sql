@@ -64,4 +64,4 @@ VALUES ('admin@gmail.com', 'admin123', 'admin');
 
 -- Link admin user to the admin table
 INSERT INTO admin (user_id)
-SELECT user_id FROM users WHERE email = 'admin';
+SELECT user_id FROM users WHERE email = 'admin@gmail.com';
