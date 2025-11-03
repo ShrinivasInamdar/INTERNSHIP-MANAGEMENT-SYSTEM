@@ -44,7 +44,8 @@ CREATE TABLE internship (
   location VARCHAR(100),
   stipend VARCHAR(50),
   duration VARCHAR(50),
-  department VARCHAR(100) NOT NULL
+  department VARCHAR(100) NOT NULL,
+  description TEXT NULL
 );
 
 -- APPLICATION TABLE
@@ -62,6 +63,6 @@ CREATE TABLE application (
 INSERT INTO users (email, password, role)
 VALUES ('admin@gmail.com', 'admin123', 'admin');
 
--- Link admin user to the admin table
+-- LINK ADMIN USER TO ADMIN TABLE
 INSERT INTO admin (user_id)
 SELECT user_id FROM users WHERE email = 'admin@gmail.com';

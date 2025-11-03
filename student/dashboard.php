@@ -3,7 +3,7 @@ require_once '../config.php';
 
 // Check if user is logged in and is a student
 if (!isLoggedIn() || !isStudent()) {
-    header(header: "Location: ../login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -289,9 +289,15 @@ $dept_result = $conn->query($dept_query);
                                 Apply by: <?php echo date('M d, Y', strtotime($internship['deadline'])); ?>
                             </div>
                         </div>
-                        <div class="col-md-3 text-end d-flex align-items-center justify-content-end">
+                        <div class="col-md-3 text-end d-flex flex-column align-items-end justify-content-center gap-2">
+                            <button class="btn btn-outline-primary btn-sm" 
+                                    onclick="viewDetails(<?php echo htmlspecialchars(json_encode($internship)); ?>)"
+                                    style="width: 150px;">
+                                <i class="fas fa-info-circle me-2"></i>View Details
+                            </button>
                             <a href="apply_internship.php?id=<?php echo $internship['internship_id']; ?>" 
-                               class="btn btn-apply">
+                               class="btn btn-apply btn-sm"
+                               style="width: 150px;">
                                 <i class="fas fa-paper-plane me-2"></i>Apply Now
                             </a>
                         </div>

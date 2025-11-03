@@ -288,9 +288,13 @@ $internships = $conn->query("SELECT * FROM internship ORDER BY posted_on DESC");
                                 <select name="department" id="department" class="form-select" required>
                                     <option value="">Select Department</option>
                                     <option value="Computer Science">Computer Science</option>
-                                    <option value="Electronics">Electronics & Computer Science</option>
+                                    <option value="Electronics">Electronics</option>
                                     <option value="Mechanical">Mechanical</option>
                                     <option value="Civil">Civil</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="IT">Information Technology</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Marketing">Marketing</option>
                                 </select>
                             </div>
                         </div>
@@ -315,24 +319,29 @@ $internships = $conn->query("SELECT * FROM internship ORDER BY posted_on DESC");
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label">Application Link</label>
+                            <input type="url" name="application_link" id="application_link" class="form-control" placeholder="https://">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Enter internship description, requirements, responsibilities, etc."></textarea>
+                        </div>
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Application Link</label>
-                                <input type="url" name="application_link" id="application_link" class="form-control" placeholder="https://">
-                            </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Deadline *</label>
                                 <input type="date" name="deadline" id="deadline" class="form-control" required>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Status *</label>
-                            <select name="status" id="status" class="form-select" required>
-                                <option value="open">Open</option>
-                                <option value="closed">Closed</option>
-                                <option value="filled">Filled</option>
-                            </select>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status *</label>
+                                <select name="status" id="status" class="form-select" required>
+                                    <option value="open">Open</option>
+                                    <option value="closed">Closed</option>
+                                    <option value="filled">Filled</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">

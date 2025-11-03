@@ -216,7 +216,7 @@ $student = $result->fetch_assoc();
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="view_applications.php">
+                        <a class="nav-link" href="my_applications.php">
                             <i class="fas fa-file-alt me-1"></i>My Applications
                         </a>
                     </li>
