@@ -213,7 +213,7 @@ $internship_result = $conn->query($internship_summary);
         </div>
 
         <div class="row">
-            <div class="col-md-3 col-sm-6 offset-md-9">
+            <div class="col-md-3 col-sm-6">
                 <div class="stats-card position-relative">
                     <i class="fas fa-clock stats-icon card-red"></i>
                     <div class="stats-number card-red"><?php echo $pending_applications; ?></div>

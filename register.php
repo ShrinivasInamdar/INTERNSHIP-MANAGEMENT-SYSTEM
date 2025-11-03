@@ -255,13 +255,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select name="department" class="form-select" required>
                             <option value="">Select Department</option>
                             <option value="Computer Science">Computer Science</option>
-                            <option value="Electronics">Electronics</option>
+                            <option value="Electronics">Electronics & Computer Science</option>
                             <option value="Mechanical">Mechanical</option>
                             <option value="Civil">Civil</option>
-                            <option value="Electrical">Electrical</option>
-                            <option value="IT">Information Technology</option>
-                            <option value="Business">Business</option>
-                            <option value="Marketing">Marketing</option>
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">

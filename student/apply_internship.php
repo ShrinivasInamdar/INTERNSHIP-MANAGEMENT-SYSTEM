@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($conn->query($insert_query)) {
         $_SESSION['success'] = "Application submitted successfully!";
-        header("Location: view_applications.php");
+        header("Location: my_applications.php");
         exit();
     } else {
         $error = "Error submitting application: " . $conn->error;

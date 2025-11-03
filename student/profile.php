@@ -11,11 +11,6 @@ $student_id = $_SESSION['student_id'];
 $success = '';
 $error = '';
 
-// Get student details
-$query = "SELECT s.*, u.email FROM student s JOIN users u ON s.user_id = u.user_id WHERE s.student_id = $student_id";
-$result = $conn->query($query);
-$student = $result->fetch_assoc();
-
 // Handle resume update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
     $upload_dir = '../uploads/resumes/';
@@ -36,31 +31,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
     } elseif ($file_size > 5242880) { // 5MB limit
         $error = "File size must be less than 5MB!";
     } else {
+        // Get current resume path before update
+        $get_old_resume = "SELECT resume_link FROM student WHERE student_id = $student_id";
+        $old_resume_result = $conn->query($get_old_resume);
+        $old_resume_data = $old_resume_result->fetch_assoc();
+        $old_resume_path = $old_resume_data['resume_link'];
+        
         // Generate unique filename
         $new_filename = uniqid('resume_') . '_' . time() . '.' . $file_ext;
-        $upload_path = $upload_dir . $new_filename;
+        $upload_path = 'uploads/resumes/' . $new_filename; // Relative path for database
+        $full_upload_path = '../' . $upload_path; // Full path for file operations
         
         // Move uploaded file
-        if (move_uploaded_file($file_tmp, $upload_path)) {
-            // Delete old resume file
-            if (file_exists($student['resume_link'])) {
-                unlink($student['resume_link']);
-            }
-            
+        if (move_uploaded_file($file_tmp, $full_upload_path)) {
             // Update database
             $update_query = "UPDATE student SET resume_link = '$upload_path' WHERE student_id = $student_id";
             if ($conn->query($update_query)) {
+                // Delete old resume file only after successful database update
+                if (file_exists('../' . $old_resume_path)) {
+                    unlink('../' . $old_resume_path);
+                }
+                
                 $success = "Resume updated successfully!";
-                $student['resume_link'] = $upload_path; // Update current display
+                
+                // Redirect to refresh page and show updated resume
+                header("Location: profile.php?success=1");
+                exit();
             } else {
                 $error = "Error updating database: " . $conn->error;
-                unlink($upload_path); // Delete file if database update fails
+                unlink($full_upload_path); // Delete file if database update fails
             }
         } else {
             $error = "Error uploading resume file!";
         }
     }
 }
+
+// Check for success parameter
+if (isset($_GET['success']) && $_GET['success'] == 1) {
+    $success = "Resume updated successfully!";
+}
+
+// Get student details
+$query = "SELECT s.*, u.email FROM student s JOIN users u ON s.user_id = u.user_id WHERE s.student_id = $student_id";
+$result = $conn->query($query);
+$student = $result->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -155,6 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
         .btn-resume:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
         }
         .file-upload-wrapper {
             position: relative;
@@ -292,7 +308,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
                     <div class="resume-section">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
-                                <i class="fas fa-file-pdf fa-2x" style="color: #d32f2f;"></i>
+                                <?php 
+                                $file_ext = strtolower(pathinfo($student['resume_link'], PATHINFO_EXTENSION));
+                                $icon_class = 'fa-file-pdf';
+                                $icon_color = '#d32f2f';
+                                if ($file_ext === 'doc' || $file_ext === 'docx') {
+                                    $icon_class = 'fa-file-word';
+                                    $icon_color = '#2b579a';
+                                }
+                                ?>
+                                <i class="fas <?php echo $icon_class; ?> fa-2x" style="color: <?php echo $icon_color; ?>;"></i>
                                 <span class="ms-3">
                                     <strong>Current Resume</strong><br>
                                     <small class="text-muted"><?php echo basename($student['resume_link']); ?></small>
@@ -301,10 +326,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
                         </div>
                         
                         <div class="d-flex gap-2">
-                            <a href="../download_resume.php?file=<?php echo urlencode($student['resume_link']); ?>" target="_blank" class="btn btn-resume flex-grow-1">
+                            <a href="../download_resume.php?file=<?php echo urlencode($student['resume_link']); ?>" 
+                               target="_blank" 
+                               class="btn btn-resume flex-grow-1">
                                 <i class="fas fa-eye me-2"></i>View Resume
                             </a>
-                            <a href="../download_resume.php?file=<?php echo urlencode($student['resume_link']); ?>" download class="btn btn-outline-primary flex-grow-1">
+                            <a href="../download_resume.php?file=<?php echo urlencode($student['resume_link']); ?>&download=1" 
+                               class="btn btn-outline-primary flex-grow-1">
                                 <i class="fas fa-download me-2"></i>Download
                             </a>
                         </div>
@@ -350,6 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
                     alert('Please upload only PDF, DOC, or DOCX files!');
                     e.target.value = '';
                     uploadBtn.disabled = true;
+                    fileText.textContent = 'Choose New File';
                     return;
                 }
                 
@@ -357,6 +386,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
                     alert('File size must be less than 5MB!');
                     e.target.value = '';
                     uploadBtn.disabled = true;
+                    fileText.textContent = 'Choose New File';
                     return;
                 }
                 
