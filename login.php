@@ -1,13 +1,16 @@
 <?php
+session_start();
 require_once 'config.php';
-
-// Redirect if already logged in
-if (isLoggedIn()) {
-    redirectToDashboard();
-}
 
 $error = '';
 
+// Redirect to dashboard if already logged in as student
+if (isStudent()) {
+    header("Location: student/dashboard.php");
+    exit();
+}
+
+// Handle login
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email']);
     $password = $_POST['password'];
@@ -15,36 +18,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = "Please enter both email and password!";
     } else {
-        // Check if user exists AND is a student
-        $query = "SELECT * FROM users WHERE email = '$email' AND role = 'student'";
-        $result = $conn->query($query);
+        $stmt = $conn->prepare("SELECT * FROM student WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            
-            // Verify password
-            if (password_verify($password, $user['password'])) {
-                // Set session variables
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = $user['role'];
+        if ($result && $result->num_rows > 0) {
+            $student = $result->fetch_assoc();
 
-                // Fetch student details
-                $student_query = "SELECT * FROM student WHERE user_id = " . $user['user_id'];
-                $student_result = $conn->query($student_query);
-                if ($student_result->num_rows > 0) {
-                    $student = $student_result->fetch_assoc();
-                    $_SESSION['student_id'] = $student['student_id'];
-                    $_SESSION['student_name'] = $student['first_name'] . ' ' . $student['last_name'];
-                }
+            if (password_verify($password, $student['password'])) {
+                // Set session
+                $_SESSION['role'] = 'student';
+                $_SESSION['student_id'] = $student['student_id'];
+                $_SESSION['student_name'] = $student['first_name'] . ' ' . $student['last_name'];
 
-                redirectToDashboard();
+                header("Location: student/dashboard.php");
+                exit();
             } else {
                 $error = "Invalid password!";
             }
         } else {
             $error = "Student account not found!";
         }
+        $stmt->close();
     }
 }
 ?>
@@ -108,13 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
-        .alert {
-            border-radius: 10px;
-        }
-        .form-label {
-            font-weight: 600;
-            color: #333;
-        }
+        .alert { border-radius: 10px; }
+        .form-label { font-weight: 600; color: #333; }
     </style>
 </head>
 <body>
@@ -122,11 +113,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row justify-content-center">
             <div class="col-md-4">
                 <div class="login-container">
-                    <div class="login-icon">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
+                    <div class="login-icon"><i class="fas fa-user-circle"></i></div>
                     <h2 class="login-title">Student Login</h2>
-                    
+
                     <?php if ($error): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <i class="fas fa-exclamation-circle me-2"></i><?php echo $error; ?>
@@ -137,18 +126,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" action="">
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="text" name="email" class="form-control" placeholder="Enter your email" required>
+                            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
                         </div>
-
                         <button type="submit" class="btn btn-login">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </button>
-
                         <div class="text-center mt-3">
                             <p>Don't have an account? <a href="register.php" style="color: #667eea; font-weight: 600;">Register here</a></p>
                             <a href="index.php" style="color: #999;">← Back to Home</a>
@@ -158,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -148,6 +148,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h4 style="color: #667eea; font-weight: 700; margin-bottom: 20px;">
                     <?php echo $internship['company_name']; ?>
                 </h4>
+
+                <?php if ($internship['description']): ?>
+                    <div class="detail-row">
+                        <span class="detail-label"><i class="fas fa-align-left me-2"></i>Description:</span>
+                        <span class="detail-value"><?php echo nl2br($internship['description']); ?></span>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-briefcase me-2"></i>Role:</span>

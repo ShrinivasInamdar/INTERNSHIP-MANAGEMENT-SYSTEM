@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $application_link = sanitize($_POST['application_link']);
     $deadline = sanitize($_POST['deadline']);
     $status = sanitize($_POST['status']);
+    $description = isset($_POST['description']) ? sanitize($_POST['description']) : '';
     $internship_id = isset($_POST['internship_id']) ? intval($_POST['internship_id']) : 0;
 
     if (empty($title) || empty($role) || empty($company_name) || empty($department) || empty($deadline)) {
@@ -41,17 +42,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($internship_id > 0) {
             // Update existing internship
             $query = "UPDATE internship SET 
-                     title='$title', role='$role', company_name='$company_name', 
-                     department='$department', location='$location', stipend='$stipend', 
-                     duration='$duration', application_link='$application_link', 
-                     deadline='$deadline', status='$status' 
-                     WHERE internship_id=$internship_id";
+             title='$title', role='$role', company_name='$company_name', 
+             department='$department', location='$location', stipend='$stipend', 
+             duration='$duration', application_link='$application_link', 
+             deadline='$deadline', status='$status', description='$description'
+             WHERE internship_id=$internship_id";
         } else {
             // Add new internship
             $posted_on = date('Y-m-d');
-            $query = "INSERT INTO internship (title, role, company_name, posted_on, application_link, deadline, status, location, stipend, duration, department) 
-                     VALUES ('$title', '$role', '$company_name', '$posted_on', '$application_link', '$deadline', '$status', '$location', '$stipend', '$duration', '$department')";
+            $query = "INSERT INTO internship (title, role, company_name, posted_on, application_link, deadline, status, location, stipend, duration, department, description) 
+             VALUES ('$title', '$role', '$company_name', '$posted_on', '$application_link', '$deadline', '$status', '$location', '$stipend', '$duration', '$department', '$description')";
         }
+        // if ($internship_id > 0) {
+        //     // Update existing internship
+        //     $query = "UPDATE internship SET 
+        //              title='$title', role='$role', company_name='$company_name', 
+        //              department='$department', location='$location', stipend='$stipend', 
+        //              duration='$duration', application_link='$application_link', 
+        //              deadline='$deadline', status='$status' 
+        //              WHERE internship_id=$internship_id";
+        // } else {
+        //     // Add new internship
+        //     $posted_on = date('Y-m-d');
+        //     $query = "INSERT INTO internship (title, role, company_name, posted_on, application_link, deadline, status, location, stipend, duration, department) 
+        //              VALUES ('$title', '$role', '$company_name', '$posted_on', '$application_link', '$deadline', '$status', '$location', '$stipend', '$duration', '$department')";
+        // }
 
         if ($conn->query($query)) {
             $success = $internship_id > 0 ? "Internship updated successfully!" : "Internship added successfully!";
@@ -366,6 +381,7 @@ $internships = $conn->query("SELECT * FROM internship ORDER BY posted_on DESC");
             document.getElementById('application_link').value = internship.application_link;
             document.getElementById('deadline').value = internship.deadline;
             document.getElementById('status').value = internship.status;
+            document.getElementById('description').value = internship.description;
             
             var modal = new bootstrap.Modal(document.getElementById('addModal'));
             modal.show();

@@ -13,8 +13,6 @@ $error = '';
 
 // Handle resume update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
-    $upload_dir = '../uploads/resumes/';
-
     $file = $_FILES['new_resume'];
     $file_name = $file['name'];
     $file_tmp = $file['tmp_name'];
@@ -31,45 +29,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
     } elseif ($file_size > 5242880) { // 5MB limit
         $error = "File size must be less than 5MB!";
     } else {
-        // Get current resume path before update
         $get_old_resume = "SELECT resume_link FROM student WHERE student_id = $student_id";
         $old_resume_result = $conn->query($get_old_resume);
         $old_resume_data = $old_resume_result->fetch_assoc();
         $old_resume_path = $old_resume_data['resume_link'];
 
-        // Generate unique filename
         $new_filename = uniqid('resume_') . '_' . time() . '.' . $file_ext;
-        $upload_path = 'uploads/resumes/' . $new_filename; // Relative path for database
-        $full_upload_path = '../' . $upload_path; // Full path for file operations
+        $upload_path = 'uploads/resumes/' . $new_filename;
+        $full_upload_path = '../' . $upload_path;
 
-        // Move uploaded file
         if (move_uploaded_file($file_tmp, $full_upload_path)) {
-            // Update database
             $update_query = "UPDATE student SET resume_link = '$upload_path' WHERE student_id = $student_id";
             if ($conn->query($update_query)) {
-                // Delete old resume file only after successful database update
-                if (file_exists('../' . $old_resume_path)) {
+                if (!empty($old_resume_path) && file_exists('../' . $old_resume_path)) {
                     unlink('../' . $old_resume_path);
                 }
-
                 $success = "Resume updated successfully!";
-
-                // Redirect to refresh page and show updated resume
                 header("Location: profile.php?success=1");
                 exit();
             } else {
                 $error = "Error updating database: " . $conn->error;
-                unlink($full_upload_path); // Delete file if database update fails
+                unlink($full_upload_path);
             }
         } else {
             $error = "Error uploading resume file!";
         }
     }
-}
-
-// Handle resume update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['new_resume'])) {
-    // ... your resume update logic
 }
 
 // Update skills block
@@ -88,23 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_skills'])) {
     }
 }
 
-// Check if skills were updated
-if (isset($_GET['skills_updated']) && $_GET['skills_updated'] == 1) {
+// Handle success messages
+if (isset($_GET['success']) && $_GET['success'] == 1) {
+    $success = "Resume updated successfully!";
+} elseif (isset($_GET['skills_updated']) && $_GET['skills_updated'] == 1) {
     $success = "Skills updated successfully!";
 }
 
-// Get student details
-$query = "SELECT s.*, u.email FROM student s JOIN users u ON s.user_id = u.user_id WHERE s.student_id = $student_id";
-$result = $conn->query($query);
-$student = $result->fetch_assoc();
-
-// Check for success parameter
-if (isset($_GET['success']) && $_GET['success'] == 1) {
-    $success = "Resume updated successfully!";
-}
-
-// Get student details
-$query = "SELECT s.*, u.email FROM student s JOIN users u ON s.user_id = u.user_id WHERE s.student_id = $student_id";
+// Get student details (email is now directly from student table)
+$query = "SELECT * FROM student WHERE student_id = $student_id";
 $result = $conn->query($query);
 $student = $result->fetch_assoc();
 ?>

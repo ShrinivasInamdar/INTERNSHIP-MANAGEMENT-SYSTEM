@@ -1,8 +1,7 @@
 <?php
 require_once 'config.php';
 
-// Redirect if already logged in
-if (isLoggedIn()) {
+if (isLoggedIn() && isStudent()) {
     redirectToDashboard();
 }
 
@@ -27,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $roll_number = sanitize($_POST['roll_number']);
 
     // Validation
-    if (empty($email) || empty($password) || empty($first_name) || empty($last_name) || 
+    if (empty($email) || empty($password) || empty($first_name) || empty($last_name) ||
         empty($skills) || empty($year) || empty($department) || empty($roll_number)) {
         $error = "All fields are required!";
     } elseif ($password !== $confirm_password) {
@@ -45,55 +44,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file_tmp = $file['tmp_name'];
         $file_size = $file['size'];
         $file_error = $file['error'];
-        
-        // Get file extension
+
         $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
         $allowed_extensions = ['pdf', 'doc', 'docx'];
-        
-        // Validate file
+
         if ($file_error !== 0) {
             $error = "Error uploading file!";
         } elseif (!in_array($file_ext, $allowed_extensions)) {
             $error = "Only PDF, DOC, and DOCX files are allowed!";
-        } elseif ($file_size > 5242880) { // 5MB limit
+        } elseif ($file_size > 5242880) {
             $error = "File size must be less than 5MB!";
         } else {
-            // Check if email already exists
-            $check_query = "SELECT * FROM users WHERE email = '$email'";
+            // Check if email already exists in student table
+            $check_query = "SELECT * FROM student WHERE email = '$email'";
             $result = $conn->query($check_query);
-            
+
             if ($result->num_rows > 0) {
                 $error = "Email already registered!";
             } else {
-                // Generate unique filename
                 $new_filename = uniqid('resume_') . '_' . time() . '.' . $file_ext;
                 $upload_path = $upload_dir . $new_filename;
-                
-                // Move uploaded file
+
                 if (move_uploaded_file($file_tmp, $upload_path)) {
-                    // Hash password
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                    
-                    // Insert into users table
-                    $user_query = "INSERT INTO users (email, password, role) VALUES ('$email', '$hashed_password', 'student')";
-                    
-                    if ($conn->query($user_query)) {
-                        $user_id = $conn->insert_id;
-                        
-                        // Insert into student table
-                        $student_query = "INSERT INTO student (user_id, first_name, last_name, resume_link, skills, year, department, roll_number) 
-                                         VALUES ('$user_id', '$first_name', '$last_name', '$upload_path', '$skills', '$year', '$department', '$roll_number')";
-                        
-                        if ($conn->query($student_query)) {
-                            $success = "Registration successful! You can now login.";
-                        } else {
-                            $error = "Error creating student profile: " . $conn->error;
-                            // Delete uploaded file if database insertion fails
-                            unlink($upload_path);
-                        }
+
+                    // Insert directly into student table
+                    $student_query = "INSERT INTO student 
+                        (email, password, role, created_at, first_name, last_name, resume_link, skills, year, department, roll_number) 
+                        VALUES 
+                        ('$email', '$hashed_password', 'student', NOW(), '$first_name', '$last_name', '$upload_path', '$skills', '$year', '$department', '$roll_number')";
+
+                    if ($conn->query($student_query)) {
+                        $success = "Registration successful! You can now login.";
                     } else {
-                        $error = "Error creating user account: " . $conn->error;
-                        // Delete uploaded file if database insertion fails
+                        $error = "Error creating student profile: " . $conn->error;
                         unlink($upload_path);
                     }
                 } else {

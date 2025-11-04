@@ -30,12 +30,10 @@ $status_filter = isset($_GET['filter_status']) ? sanitize($_GET['filter_status']
 $internship_filter = isset($_GET['filter_internship']) ? intval($_GET['filter_internship']) : 0;
 
 // Build query with filters
-// Build query with filters
-$query = "SELECT a.*, s.first_name, s.last_name, u.email, s.department as student_dept, s.year, s.resume_link, s.skills,
+$query = "SELECT a.*, s.first_name, s.last_name, s.email, s.department as student_dept, s.year, s.resume_link, s.skills,
           i.title, i.role, i.company_name, i.department as internship_dept
           FROM application a
           JOIN student s ON a.student_id = s.student_id
-          JOIN users u ON s.user_id = u.user_id
           JOIN internship i ON a.internship_id = i.internship_id";
 
 $conditions = [];

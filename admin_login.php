@@ -1,12 +1,14 @@
 <?php
+session_start();
 require_once 'config.php';
 
-// Redirect if already logged in and is admin
-if (isLoggedIn() && $_SESSION['role'] === 'admin') {
-    redirectToDashboard();
-}
-
 $error = '';
+
+// Redirect if already logged in as admin
+if (isset($_SESSION['admin_id']) && $_SESSION['role'] === 'admin') {
+    header("Location: admin/dashboard.php");
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email']);
@@ -15,34 +17,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = "Please enter both email and password!";
     } else {
-        // Fetch user by email
-        $query = "SELECT * FROM users WHERE email = '$email'";
+        // Check admin table
+        $query = "SELECT * FROM admin WHERE email = '$email'";
         $result = $conn->query($query);
 
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
+        if ($result && $result->num_rows > 0) {
+            $admin = $result->fetch_assoc();
 
-            // Check if user is admin
-            if ($user['role'] !== 'admin') {
-                $error = "Access denied! Only admins can log in here.";
+            // Plain-text password check
+            if ($password === $admin['password']) {
+                $_SESSION['admin_id'] = $admin['admin_id'];
+                $_SESSION['email'] = $admin['email'];
+                $_SESSION['role'] = 'admin';
+
+                header("Location: admin/dashboard.php");
+                exit();
             } else {
-                // Verify password
-                if (password_verify($password, $user['password']) || ($user['email'] === 'admin@gmail.com' && $password === 'admin123')) {
-                    $_SESSION['user_id'] = $user['user_id'];
-                    $_SESSION['email'] = $user['email'];
-                    $_SESSION['role'] = $user['role'];
-
-                    redirectToDashboard();
-                } else {
-                    $error = "Invalid password!";
-                }
+                $error = "Invalid password!";
             }
         } else {
-            $error = "Email not found!";
+            $error = "Admin account not found!";
         }
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
