@@ -86,6 +86,9 @@ $internships_result = $conn->query($internships_query);
         .navbar-custom .nav-link:hover {
             color: white;
         }
+        .navbar-custom .nav-link.active{
+            color: yellow;
+        }
         .content-card {
             background: white;
             border-radius: 15px;
@@ -311,35 +314,42 @@ $internships_result = $conn->query($internships_query);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function showStudentInfo(app) {
-            const details = `
-                <div class="mb-3">
-                    <strong>Name:</strong> ${app.first_name} ${app.last_name}
-                </div>
-                <div class="mb-3">
-                    <strong>Email:</strong> ${app.email}
-                </div>
-                <div class="mb-3">
-                    <strong>Department:</strong> ${app.student_dept}
-                </div>
-                <div class="mb-3">
-                    <strong>Year:</strong> ${app.year}
-                </div>
-                                                <div class="mb-3">
-                    <strong>Skills:</strong> ${app.skills}
-                </div>
-                                                <div class="mb-3">
-                    <strong>Resume:</strong><br>
-                    <a href="../download_resume.php?file=${encodeURIComponent(app.resume_link)}" target="_blank" class="btn btn-sm btn-primary me-2">
-                        <i class="fas fa-eye me-2"></i>View Resume
-                    </a>
-                    <a href="../download_resume.php?file=${encodeURIComponent(app.resume_link)}" download class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-download me-2"></i>Download Resume
-                    </a>
-                </div>
-            `;
-            document.getElementById('studentDetails').innerHTML = details;
-        }
-    </script>
+    function showStudentInfo(app) {
+    const studentDetailsDiv = document.getElementById('studentDetails');
+    
+    // Basic student info
+    let details = `
+        <div class="mb-3"><strong>Name:</strong> ${app.first_name} ${app.last_name}</div>
+        <div class="mb-3"><strong>Email:</strong> ${app.email}</div>
+        <div class="mb-3"><strong>Department:</strong> ${app.student_dept}</div>
+        <div class="mb-3"><strong>Year:</strong> ${app.year}</div>
+        <div class="mb-3"><strong>Skills:</strong> ${app.skills}</div>
+        <div class="mb-3">
+            <strong>Resume:</strong><br>
+            <a href="../download_resume.php?file=${encodeURIComponent(app.resume_link)}" download class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-download me-2"></i>Download Resume
+            </a>
+        </div>
+        <hr>
+        <h6><i class="fas fa-briefcase me-2"></i>Internships Applied</h6>
+        <div id="studentApplications">
+            <div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-2"></i>Loading...</div>
+        </div>
+    `;
+
+    studentDetailsDiv.innerHTML = details;
+
+    // Fetch internships using AJAX
+    fetch(`fetch_student_applications.php?student_id=${app.student_id}`)
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('studentApplications').innerHTML = data;
+        })
+        .catch(err => {
+            document.getElementById('studentApplications').innerHTML = `<p class="text-danger">Error loading data.</p>`;
+        });
+}
+</script>
+    
 </body>
 </html>

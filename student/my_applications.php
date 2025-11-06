@@ -42,6 +42,9 @@ $result = $conn->query($query);
         .badge-applied { background: #fff3e0; color: #f57c00; }
         .badge-accepted { background: #e8f5e9; color: #388e3c; }
         .badge-rejected { background: #ffebee; color: #d32f2f; }
+        .navbar-custom .nav-link.active{
+            color: yellow;
+        }
     </style>
 </head>
 <body>

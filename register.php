@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validation
     if (empty($email) || empty($password) || empty($first_name) || empty($last_name) ||
         empty($skills) || empty($year) || empty($department) || empty($roll_number)) {
-        $error = "All fields are required!";
+        $error = "Please Fill all the Details!";
     } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match!";
     } elseif (strlen($password) < 6) {
@@ -223,13 +223,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3 position-relative">
                         <label class="form-label">Password</label>
                         <input type="password" name="password" class="form-control" id="password" required>
+                        <i class="fas fa-eye position-absolute" id="togglePassword" style="top: 43px; right: 20px; cursor: pointer; color: gray;"></i>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3 position-relative">
                         <label class="form-label">Confirm Password</label>
                         <input type="password" name="confirm_password" class="form-control" id="confirm_password" required>
+                        <i class="fas fa-eye position-absolute" id="toggleConfirmPassword" style="top: 43px; right: 20px; cursor: pointer; color: gray;"></i>
                     </div>
                 </div>
 
@@ -239,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select name="department" class="form-select" required>
                             <option value="">Select Department</option>
                             <option value="Computer Science">Computer Science</option>
-                            <option value="Electronics">Electronics & Computer Science</option>
+                            <option value="Electronics & Computer Science">Electronics & Computer Science</option>
                             <option value="Mechanical">Mechanical</option>
                             <option value="Civil">Civil</option>
                         </select>
@@ -266,6 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <textarea name="skills" class="form-control" rows="3" placeholder="e.g., Python, JavaScript, React" required></textarea>
                 </div>
 
+                <!-- ✅ Restored Original Resume Upload -->
                 <div class="mb-3">
                     <label class="form-label">Upload Resume (PDF, DOC, DOCX - Max 5MB)</label>
                     <div class="file-upload-wrapper">
@@ -293,18 +296,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Password validation
+        // ✅ Password toggle
+        document.getElementById('togglePassword').onclick = function() {
+            const password = document.getElementById('password');
+            password.type = password.type === 'password' ? 'text' : 'password';
+            this.classList.toggle('fa-eye-slash');
+        };
+        document.getElementById('toggleConfirmPassword').onclick = function() {
+            const password = document.getElementById('confirm_password');
+            password.type = password.type === 'password' ? 'text' : 'password';
+            this.classList.toggle('fa-eye-slash');
+        };
+
+        // ✅ Front-end validation
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
-            
-            if (password !== confirmPassword) {
+            const email = document.querySelector('input[name="email"]').value;
+
+            if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
+                alert('Please enter a valid email!');
                 e.preventDefault();
+                return;
+            }
+
+            if (password !== confirmPassword) {
                 alert('Passwords do not match!');
+                e.preventDefault();
+                return;
             }
         });
 
-        // File upload display
+        // ✅ Resume file preview + validation
         document.getElementById('resume').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const fileLabel = document.getElementById('fileLabel');
@@ -312,18 +335,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if (file) {
                 const fileName = file.name;
-                const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
                 const fileExt = fileName.split('.').pop().toLowerCase();
                 
-                // Validate file type
                 if (!['pdf', 'doc', 'docx'].includes(fileExt)) {
                     alert('Please upload only PDF, DOC, or DOCX files!');
                     e.target.value = '';
                     return;
                 }
-                
-                // Validate file size
-                if (file.size > 5242880) { // 5MB
+                if (file.size > 5242880) {
                     alert('File size must be less than 5MB!');
                     e.target.value = '';
                     return;

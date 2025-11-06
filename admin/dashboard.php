@@ -62,6 +62,9 @@ $internship_result = $conn->query($internship_summary);
             color: white;
             transform: translateY(-2px);
         }
+        .navbar-custom .nav-link.active{
+            color: yellow;
+        }
         .stats-card {
             background: white;
             border-radius: 15px;
@@ -138,6 +141,10 @@ $internship_result = $conn->query($internship_summary);
         .badge-accepted {
             background: #e8f5e9;
             color: #388e3c;
+        }
+        .badge-rejected{
+            background: #ff89892d;
+            color: #d32f2f;
         }
     </style>
 </head>

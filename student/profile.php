@@ -250,6 +250,9 @@ $student = $result->fetch_assoc();
         .file-upload-label:hover {
             background: #764ba2;
         }
+        .navbar-custom .nav-link.active{
+            color: yellow;
+        }
     </style>
 </head>
 

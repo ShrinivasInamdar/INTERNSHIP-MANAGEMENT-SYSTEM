@@ -153,6 +153,9 @@ $dept_result = $conn->query($dept_query);
             padding: 60px;
             color: #999;
         }
+        .navbar-custom .nav-link.active{
+            color: yellow;
+        }
     </style>
 </head>
 <body>
@@ -333,6 +336,45 @@ $dept_result = $conn->query($dept_query);
     </div>
   </div>
 </div>
+
+<!-- Toast message for applied internship -->
+<?php if (isset($_SESSION['toast_message'])): ?>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+        <div id="liveToast" 
+     class="toast align-items-center border-0 text-white" 
+     role="alert" aria-live="assertive" aria-atomic="true"
+     style="
+        background: <?php 
+            echo match($_SESSION['toast_type']) {
+                'success' => 'linear-gradient(135deg, #4CAF50 0%, #81C784 100%)',
+                'warning' => 'linear-gradient(135deg, #FFB74D 0%, #FF9800 100%)',
+                'danger'  => 'linear-gradient(135deg, #e57373 0%, #ef5350 100%)',
+                default   => 'linear-gradient(135deg, #e57373 0%, #ef5350 100%)' }; 
+        ?>;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        border-radius: 12px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-info-circle me-2"></i><?php echo $_SESSION['toast_message']; ?>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toastEl = document.getElementById('liveToast');
+        const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+        toast.show();
+    });
+</script>
+
+<?php 
+unset($_SESSION['toast_message']);
+unset($_SESSION['toast_type']);
+endif; 
+?>
 
 <script>
 function viewDetails(internship) {

@@ -31,7 +31,8 @@ $check_query = "SELECT * FROM application WHERE student_id = " . $_SESSION['stud
 $check_result = $conn->query($check_query);
 
 if ($check_result->num_rows > 0) {
-    $_SESSION['error'] = "You have already applied for this internship!";
+    $_SESSION['toast_message'] = "You have already applied for this internship!";
+    $_SESSION['toast_type'] = "warning";
     header("Location: dashboard.php");
     exit();
 }
@@ -45,11 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      VALUES ($student_id, $internship_id, '$applied_on', 'applied')";
     
     if ($conn->query($insert_query)) {
-        $_SESSION['success'] = "Application submitted successfully!";
-        header("Location: my_applications.php");
+        $_SESSION['toast_message'] = "Application submitted successfully!";
+        $_SESSION['toast_type'] = "success";
+        header("Location: dashboard.php");
         exit();
     } else {
-        $error = "Error submitting application: " . $conn->error;
+        $_SESSION['toast_message'] = "Error submitting application. Please try again!";
+        $_SESSION['toast_type'] = "danger";
+        header("Location: dashboard.php");
+        exit();
     }
 }
 ?>
@@ -127,6 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .badge-stipend {
             background: #e8f5e9;
             color: #388e3c;
+        }
+        .navbar-custom .nav-link.active{
+            color: yellow;
         }
     </style>
 </head>

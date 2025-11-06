@@ -110,6 +110,9 @@ $internships = $conn->query("SELECT * FROM internship ORDER BY posted_on DESC");
         .navbar-custom .nav-link:hover {
             color: white;
         }
+        .navbar-custom .nav-link.active{
+            color: yellow;
+        }
         .content-card {
             background: white;
             border-radius: 15px;
@@ -303,7 +306,7 @@ $internships = $conn->query("SELECT * FROM internship ORDER BY posted_on DESC");
                                 <select name="department" id="department" class="form-select" required>
                                     <option value="">Select Department</option>
                                     <option value="Computer Science">Computer Science</option>
-                                    <option value="Electronics">Electronics & Computer Science</option>
+                                    <option value="Electronics & Computer Science">Electronics & Computer Science</option>
                                     <option value="Mechanical">Mechanical</option>
                                     <option value="Civil">Civil</option>
                                 </select>
