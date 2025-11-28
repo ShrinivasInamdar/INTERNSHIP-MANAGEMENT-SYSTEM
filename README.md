@@ -14,7 +14,7 @@ This project allows admins to post internships and students to browse and apply.
 | ![Screenshot 1](images/student.png) | ![Screenshot 2](images/admin.png) |
 
 ### Additional Screenshot
-![Screenshot 3](images/login)
+![Screenshot 3](images/login.png)
 
 ---
 
