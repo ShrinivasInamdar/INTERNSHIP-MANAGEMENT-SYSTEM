@@ -76,4 +76,6 @@ $user = "root";
 $pass = "";
 $dbname = "internship_db";
 $conn = mysqli_connect($host, $user, $pass, $dbname);
-
+```
+Admin Credentials:- admin@gmail.com
+password:- admin123
